@@ -27,8 +27,6 @@ setup(
         ]
     },
 
-    # Include ini-file(s) from act/workers/etc
-    package_data={'act.types': ['etc/*.json']},
     packages=["act.admin"],
 
     # https://packaging.python.org/guides/packaging-namespace-packages/#pkgutil-style-namespace-packages
