@@ -2,6 +2,8 @@
 
 ## Introduction
 
+This package should only be used with act-api, act-workers, act-types at version 2.x.x.
+
 This package contains management utilities for the [ACT Platform](https://github.com/mnemonic-no/act-platform).
 
 ## Installation
@@ -10,12 +12,6 @@ This package contains management utilities for the [ACT Platform](https://github
 ```bash
 pip install act-admin
 ```
-
-## Breaking changes
-
-### 2.0 Updated data model
-
-This package should only be used with act-api, act-workers, act-types at version 2.x.x.
 
 ## act-origin [usage](usage)
 
