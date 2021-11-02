@@ -1,0 +1,8 @@
+*swp
+*old
+.*
+!.flake8
+__pycache__
+*.egg-info
+dist
+*.pyc
