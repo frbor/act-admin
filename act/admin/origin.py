@@ -14,7 +14,7 @@ from act.api.libs import cli
 
 
 def parseargs() -> argparse.ArgumentParser:
-    """ Parse arguments """
+    """Parse arguments"""
     parser = act.api.libs.cli.parseargs("ACT Origin utilities")
     parser.add_argument("--list", action="store_true", help="List origins")
     parser.add_argument("--add", action="store_true", help="List origins")
@@ -26,7 +26,6 @@ def parseargs() -> argparse.ArgumentParser:
     parser.add_argument("--default-trust", default="0.8", help="Default trust")
 
     return parser
-
 
 
 def add_origin(actapi: act.api.Act, default_trust: Text) -> None:
@@ -112,5 +111,5 @@ def main() -> None:
         raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

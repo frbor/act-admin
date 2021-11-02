@@ -10,9 +10,13 @@ from typing import Any, Dict, List
 
 import act.api
 from act.api.libs import cli
-from act.types.types import (DEFAULT_VALIDATOR, default_fact_types,
-                             default_meta_fact_types, default_object_types,
-                             load_types)
+from act.types.types import (
+    DEFAULT_VALIDATOR,
+    default_fact_types,
+    default_meta_fact_types,
+    default_object_types,
+    load_types,
+)
 
 
 class TypeLoadError(Exception):
@@ -20,37 +24,30 @@ class TypeLoadError(Exception):
 
 
 def parseargs() -> argparse.Namespace:
-    """ Parse arguments """
+    """Parse arguments"""
     parser = cli.parseargs("ACT Type utilities")
     parser.add_argument("--list", action="store_true", help="List types")
     parser.add_argument("--add", action="store_true", help="Add types")
     parser.add_argument(
-        "--default-object-types",
-        action="store_true",
-        help="Default object types")
+        "--default-object-types", action="store_true", help="Default object types"
+    )
     parser.add_argument(
-        "--default-fact-types",
-        action="store_true",
-        help="Default fact types")
+        "--default-fact-types", action="store_true", help="Default fact types"
+    )
     parser.add_argument(
-        "--default-meta-fact-types",
-        action="store_true",
-        help="Default meta fact types")
+        "--default-meta-fact-types", action="store_true", help="Default meta fact types"
+    )
+    parser.add_argument("--object-types-file", help="Object type definitions (json)")
+    parser.add_argument("--fact-types-file", help="Fact type definitions (json)")
     parser.add_argument(
-        "--object-types-file",
-        help="Object type definitions (json)")
-    parser.add_argument(
-        "--fact-types-file",
-        help="Fact type definitions (json)")
-    parser.add_argument(
-        "--meta-fact-types-file",
-        help="Meta Fact type definitions (json)")
+        "--meta-fact-types-file", help="Meta Fact type definitions (json)"
+    )
 
     return parser
 
 
 def print_json(o: Any) -> None:
-    " Print dict as sorted, indented json object "
+    "Print dict as sorted, indented json object"
     print(json.dumps(o, indent=4, sort_keys=True))
 
 
@@ -59,8 +56,9 @@ def create_object_types(client: act.api.Act, object_types: List[Dict]) -> None:
     Create object types
     """
 
-    existing_object_types = [object_type.name
-                             for object_type in client.get_object_types()]
+    existing_object_types = [
+        object_type.name for object_type in client.get_object_types()
+    ]
 
     # Create all objects
     for object_type in object_types:
@@ -87,11 +85,12 @@ def create_fact_types(client: act.api.Act, fact_types: List[Dict]) -> None:
         object_bindings = fact_type.get("objectBindings", [])
 
         if not object_bindings:
-            client.create_fact_type_all_bindings(
-                name, validator_parameter=validator)
+            client.create_fact_type_all_bindings(name, validator_parameter=validator)
 
         else:
-            client.create_fact_type(name, validator=validator, object_bindings=object_bindings)
+            client.create_fact_type(
+                name, validator=validator, object_bindings=object_bindings
+            )
 
 
 def create_meta_fact_types(client: act.api.Act, meta_fact_types: List[Dict]) -> None:
@@ -107,10 +106,14 @@ def create_meta_fact_types(client: act.api.Act, meta_fact_types: List[Dict]) -> 
         fact_bindings = meta_fact_type.get("factBindings", [])
 
         if not fact_bindings:
-            client.create_meta_fact_type_all_bindings(name, validator_parameter=validator)
+            client.create_meta_fact_type_all_bindings(
+                name, validator_parameter=validator
+            )
 
         else:
-            client.create_meta_fact_type(name, fact_bindings=fact_bindings, validator=validator)
+            client.create_meta_fact_type(
+                name, fact_bindings=fact_bindings, validator=validator
+            )
 
 
 def main() -> None:
@@ -122,12 +125,14 @@ def main() -> None:
         cli.fatal("Specify either --list, --add")
 
     if args.list:
-        if not (args.default_object_types or
-                args.default_fact_types or
-                args.default_meta_fact_types or
-                args.object_types_file or
-                args.fact_types_file or
-                args.meta_fact_types_file):
+        if not (
+            args.default_object_types
+            or args.default_fact_types
+            or args.default_meta_fact_types
+            or args.object_types_file
+            or args.fact_types_file
+            or args.meta_fact_types_file
+        ):
             critical("Specify what types to show using --default-* or a file")
             sys.exit(1)
 
