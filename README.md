@@ -30,7 +30,7 @@ Origin(name='myorigin', id='e5a9792e-78c7-4190-9275-27616be47ca8', organization=
 To bootstrap the type system with default types (userid/act-baseurl must point to ACT installation):
 ```
 act-types \
-    --userid 1 \
+    --user-id 1 \
     --act-baseurl http://localhost:8888 \
     --loglevel ERROR \
     --default-object-types \
