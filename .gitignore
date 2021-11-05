@@ -1,8 +1,12 @@
-*swp
 *old
 .*
 !.flake8
 __pycache__
 *.egg-info
 dist
+build/
+dist/
 *.pyc
+*.swp
+.cache
+.mypy_cache
