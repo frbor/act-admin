@@ -9,14 +9,11 @@ from logging import critical, warning
 from typing import Any, Dict, List
 
 import act.api
+from act.api import (DEFAULT_FACT_VALIDATOR, DEFAULT_METAFACT_VALIDATOR,
+                     DEFAULT_OBJECT_VALIDATOR)
 from act.api.libs import cli
-from act.types.types import (
-    DEFAULT_VALIDATOR,
-    default_fact_types,
-    default_meta_fact_types,
-    default_object_types,
-    load_types,
-)
+from act.types.types import (default_fact_types, default_meta_fact_types,
+                             default_object_types, load_types)
 
 
 class TypeLoadError(Exception):
@@ -63,7 +60,7 @@ def create_object_types(client: act.api.Act, object_types: List[Dict]) -> None:
     # Create all objects
     for object_type in object_types:
         name = object_type["name"]
-        validator = object_type.get("validator", DEFAULT_VALIDATOR)
+        validator = object_type.get("validator", DEFAULT_OBJECT_VALIDATOR)
 
         if name in existing_object_types:
             warning("Object type %s already exists" % name)
@@ -81,7 +78,7 @@ def create_fact_types(client: act.api.Act, fact_types: List[Dict]) -> None:
 
     for fact_type in fact_types:
         name = fact_type["name"]
-        validator = fact_type.get("validator", DEFAULT_VALIDATOR)
+        validator = fact_type.get("validator", DEFAULT_FACT_VALIDATOR)
         object_bindings = fact_type.get("objectBindings", [])
 
         if not object_bindings:
@@ -102,7 +99,7 @@ def create_meta_fact_types(client: act.api.Act, meta_fact_types: List[Dict]) -> 
 
     for meta_fact_type in meta_fact_types:
         name = meta_fact_type["name"]
-        validator = meta_fact_type.get("validator", DEFAULT_VALIDATOR)
+        validator = meta_fact_type.get("validator", DEFAULT_METAFACT_VALIDATOR)
         fact_bindings = meta_fact_type.get("factBindings", [])
 
         if not fact_bindings:
