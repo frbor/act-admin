@@ -17,8 +17,10 @@ def parseargs() -> argparse.ArgumentParser:
     """Parse arguments"""
     parser = act.api.libs.cli.parseargs("ACT Origin utilities")
     parser.add_argument("--list", action="store_true", help="List origins")
-    parser.add_argument("--add", action="store_true", help="List origins")
-    parser.add_argument("--delete", action="store_true", help="List origins")
+    parser.add_argument("--add", action="store_true", help="Add origin")
+    parser.add_argument("--delete", action="store_true", help="Delete origin")
+
+    parser.add_argument("--origin-id", help="Origin ID (UUID)")
 
     # Trust is converted to float before sending a request to the platform
     # and since this value can come from an ini file (where it will be a string)
