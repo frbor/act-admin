@@ -7,7 +7,7 @@ import configparser
 import re
 import sys
 import traceback
-from logging import error
+from logging import debug, error, info, warning
 from pathlib import Path
 from typing import Optional, Text
 
@@ -39,14 +39,19 @@ def parseargs() -> argparse.ArgumentParser:
     return parser
 
 
-def float_or_fatal(value: Optional[Text]) -> Optional[float]:
+def fatal(message: Text, exit_code: int = 1):
+    error(message)
+    sys.exit(exit_code)
+
+
+def float_or_fatal(value: Optional[Text], default: float) -> float:
     if value is None or value == "":
-        return None
+        return default
 
     try:
         return float(value)
     except ValueError:
-        cli.fatal(f"Unable to {value} to float")
+        fatal(f"Unable to convert {value} to float")
 
 
 def add_origin_cli(actapi: act.api.Act, default_trust: float) -> None:
@@ -55,7 +60,7 @@ def add_origin_cli(actapi: act.api.Act, default_trust: float) -> None:
     sys.stdout.write("Origin description: ")
     description = input()
     sys.stdout.write("Origin trust (float 0.0-1.0. Default=0.8): ")
-    trust = float_or_fatal(input())
+    trust = float_or_fatal(input(), default_trust)
     sys.stdout.write("Origin organization (UUID): ")
     organization = input()
 
@@ -75,7 +80,7 @@ def add_origin(
         trust = default_trust
 
     if not (trust >= 0.0 and trust <= 1.0):
-        cli.fatal(f"Trust must be between 0.0 and 1.0: {trust}")
+        fatal(f"Trust must be between 0.0 and 1.0: {trust}")
 
     params = {
         "name": name,
@@ -85,17 +90,16 @@ def add_origin(
 
     if organization:
         if not re.search(act.api.re.UUID_MATCH, organization):
-            cli.fatal("Organization must be a valid UUID")
+            fatal("Organization must be a valid UUID")
 
         params["organization"] = organization
 
     origin = actapi.origin(**params)
     try:
         origin.add()
-        print("Origin added:")
-        print(origin)
+        info(f"Origin added: {origin}")
     except act.api.base.ResponseError as e:
-        sys.stderr.write(f"Error adding origin: {e}\n")
+        warning(f"Error adding origin: {e}\n")
 
 
 def add_origin_from_config(actapi: act.api.Act, default_trust: float) -> None:
@@ -106,7 +110,14 @@ def add_origin_from_config(actapi: act.api.Act, default_trust: float) -> None:
 
     for section in config.sections():
         name = config[section].get("origin-name")
+        disabled = config[section].getboolean("disabled")
+
+        if disabled:
+            info(f"Worker is disabled, skipping origin for {section}")
+            continue
+
         if not name:
+            debug(f"No origin-name specified in {section}")
             continue
 
         organization = config[section].get("origin-organization")
@@ -115,7 +126,7 @@ def add_origin_from_config(actapi: act.api.Act, default_trust: float) -> None:
         description = config[section].get("origin-description", name)
 
         # Get trust from config, default to default_trust
-        trust = float_or_fatal(config[section].get("origin-trust", default_trust))
+        trust = float_or_fatal(config[section].get("origin-trust"), default_trust)
 
         add_origin(actapi, name, description, default_trust, trust, organization)
 
@@ -151,13 +162,13 @@ def main() -> None:
         args = cli.handle_args(parseargs())
 
         if not (args.act_baseurl):
-            cli.fatal("--act-baseurl must be specified")
+            fatal("--act-baseurl must be specified")
 
-        if not (args.list or args.add or args.delete or args.from_config):
-            cli.fatal("Specify either --list, --add or --delete")
+        if sum([args.list or args.add or args.delete or args.from_config]) != 1:
+            fatal("Specify either --from-config, --list, --add or --delete")
 
         if (args.delete) and not (args.origin_id):
-            cli.fatal("Specify --origin-id to delete an origin")
+            fatal("Specify --origin-id to delete an origin")
 
         actapi = cli.init_act(args)
         origin_handler(actapi, args)
