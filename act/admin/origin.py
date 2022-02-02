@@ -39,7 +39,7 @@ def parseargs() -> argparse.ArgumentParser:
     return parser
 
 
-def fatal(message: Text, exit_code: int = 1):
+def fatal(message: Text, exit_code: int = 1) -> None:
     error(message)
     sys.exit(exit_code)
 
@@ -167,11 +167,11 @@ def main() -> None:
         # (or replace .config with $XDG_CONFIG_DIR if set)
         args = cli.handle_args(parseargs())
 
-        if not (args.act_baseurl):
-            fatal("--act-baseurl must be specified")
-
         if sum([args.list or args.add or args.delete or args.from_config]) != 1:
             fatal("Specify either --from-config, --list, --add or --delete")
+
+        if not (args.act_baseurl):
+            fatal("--act-baseurl must be specified")
 
         if (args.delete) and not (args.origin_id):
             fatal("Specify --origin-id to delete an origin")
