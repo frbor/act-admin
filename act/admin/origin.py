@@ -64,10 +64,12 @@ def add_origin_cli(actapi: act.api.Act, default_trust: float) -> None:
     sys.stdout.write("Origin organization (UUID): ")
     organization = input()
 
-    add_origin(actapi, name, description, default_trust, trust, organization)
+    add_origin_to_platform(
+        actapi, name, description, default_trust, trust, organization
+    )
 
 
-def add_origin(
+def add_origin_to_platform(
     actapi: act.api.Act,
     name: Text,
     description: Text,
@@ -128,7 +130,9 @@ def add_origin_from_config(actapi: act.api.Act, default_trust: float) -> None:
         # Get trust from config, default to default_trust
         trust = float_or_fatal(config[section].get("origin-trust"), default_trust)
 
-        add_origin(actapi, name, description, default_trust, trust, organization)
+        add_origin_to_platform(
+            actapi, name, description, default_trust, trust, organization
+        )
 
 
 def origin_handler(actapi: act.api.Act, args: argparse.Namespace) -> None:
