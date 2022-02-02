@@ -50,8 +50,10 @@ def float_or_fatal(value: Optional[Text], default: float) -> float:
 
     try:
         return float(value)
+    except TypeError:
+        fatal(f"Unable to convert {value} (type={type(value)}) to float")
     except ValueError:
-        fatal(f"Unable to convert {value} to float")
+        fatal(f"Unable to convert {value} (type={type(value)}) to float")
 
 
 def add_origin_cli(actapi: act.api.Act, default_trust: float) -> None:

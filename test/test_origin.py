@@ -7,7 +7,7 @@ def test_float_or_fatal_should_fail() -> None:
 
     default = 0.8
 
-    for value in ("X", "x0.8", "0.8x"):
+    for value in ("X", "x0.8", "0.8x", {"trust": 0.8}):
 
         # https://medium.com/python-pandemonium/testing-sys-exit-with-pytest-10c6e5f7726f
         with pytest.raises(SystemExit) as pytest_wrapped_e:
