@@ -167,7 +167,7 @@ def main() -> None:
         # (or replace .config with $XDG_CONFIG_DIR if set)
         args = cli.handle_args(parseargs())
 
-        if sum([args.list or args.add or args.delete or args.from_config]) != 1:
+        if sum([args.list, args.add, args.delete, args.from_config]) != 1:
             fatal("Specify either --from-config, --list, --add or --delete")
 
         if not (args.act_baseurl):
