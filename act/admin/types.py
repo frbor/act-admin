@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 from logging import critical, warning
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Text, cast
 
 import act.api
 from act.api import (DEFAULT_FACT_VALIDATOR, DEFAULT_METAFACT_VALIDATOR,
@@ -40,7 +40,14 @@ def parseargs() -> argparse.Namespace:
         "--meta-fact-types-file", help="Meta Fact type definitions (json)"
     )
 
-    return parser
+    parser.add_argument(
+        "--no-index-option",
+        action="store_true",
+        help="Do not use indexOption from type definitions."
+        "This option can be used to bootstrap legacy platforms without support for daily indices.",
+    )
+
+    return cast(argparse.Namespace, parser)
 
 
 def print_json(o: Any) -> None:
@@ -48,7 +55,9 @@ def print_json(o: Any) -> None:
     print(json.dumps(o, indent=4, sort_keys=True))
 
 
-def create_object_types(client: act.api.Act, object_types: List[Dict]) -> None:
+def create_object_types(
+    client: act.api.Act, object_types: List[Dict[Text, Any]], no_index_option: bool
+) -> None:
     """
     Create object types
     """
@@ -59,17 +68,27 @@ def create_object_types(client: act.api.Act, object_types: List[Dict]) -> None:
 
     # Create all objects
     for object_type in object_types:
+
         name = object_type["name"]
-        validator = object_type.get("validator", DEFAULT_OBJECT_VALIDATOR)
+
+        params = {
+            "name": name,
+            "validator_parameter": object_type.get(
+                "validator", DEFAULT_OBJECT_VALIDATOR
+            ),
+        }
+
+        if not no_index_option:
+            params["index_option"] = object_type.get("indexOption", "Daily")
 
         if name in existing_object_types:
             warning("Object type %s already exists" % name)
             continue
 
-        client.object_type(name=name, validator_parameter=validator).add()
+        client.object_type(**params).add()
 
 
-def create_fact_types(client: act.api.Act, fact_types: List[Dict]) -> None:
+def create_fact_types(client: act.api.Act, fact_types: List[Dict[Text, Any]]) -> None:
     """
     Create fact type with allowed bindings to ALL objects
     We want to change this later, but keep it like this to make it simpler
@@ -90,7 +109,9 @@ def create_fact_types(client: act.api.Act, fact_types: List[Dict]) -> None:
             )
 
 
-def create_meta_fact_types(client: act.api.Act, meta_fact_types: List[Dict]) -> None:
+def create_meta_fact_types(
+    client: act.api.Act, meta_fact_types: List[Dict[Text, Any]]
+) -> None:
     """
     Create fact type with allowed bindings to ALL objects
     We want to change this later, but keep it like this to make it simpler
@@ -165,7 +186,9 @@ def main() -> None:
 
         try:
             if args.default_object_types:
-                create_object_types(client, default_object_types())
+                create_object_types(
+                    client, default_object_types(), args.no_index_option
+                )
 
             if args.default_fact_types:
                 create_fact_types(client, default_fact_types())
@@ -174,7 +197,9 @@ def main() -> None:
                 create_meta_fact_types(client, default_meta_fact_types())
 
             if args.object_types_file:
-                create_object_types(client, load_types(args.object_types_file))
+                create_object_types(
+                    client, load_types(args.object_types_file), args.no_index_option
+                )
 
             if args.fact_types_file:
                 create_fact_types(client, load_types(args.fact_types_file))

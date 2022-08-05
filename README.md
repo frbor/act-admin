@@ -6,6 +6,12 @@ This package should only be used with act-api, act-workers, act-types at version
 
 This package contains management utilities for the [ACT Platform](https://github.com/mnemonic-no/act-platform).
 
+# Changelog
+
+## 2.1.0
+
+* Support for `indexOption` for Daily/TimeGlobal indices in the platform. Use `--no-index-option` as argument to `act-types` to bootstrap legacay platforms without this feature.
+
 ## Installation
 1. This project requires that you have a running installation of the [act-platform](https://github.com/mnemonic-no/act-platform).
 2. Install from pip
